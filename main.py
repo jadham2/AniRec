@@ -61,7 +61,7 @@ def printTopMedia(response):
             # print the user's top 10 media.
             print('Your name is: ' + json_resp['data']['User']['name'] + '\nand your top rated Anime are: ')
             for entry in json_resp['data']['Page']['mediaList']:
-                print(entry['media']['title']['romaji'] + " with a score of: " + str(entry['score']))
+                print("\"" + entry['media']['title']['romaji'] + "\" with a score of: " + str(entry['score']))
     elif response.status_code == 404:
         print("Could not find your Anilist Profile.")
 
