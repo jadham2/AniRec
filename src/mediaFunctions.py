@@ -1,30 +1,10 @@
+# Must import python's requests library and the custom query.
 import requests
+from grabTopMedia import grabTopMediaQuery
 
-def getTopMedia():
-    # query with pagination to grab the user's top 10 media entries.
-    # TODO: Handle where the user doesn't have 10 entries / devise a better way to get their favorite media.
-    query = '''
-        query ($name: String, $chosenType: MediaType) { 
-            User (name: $name) {
-               name
-           }
-            Page (page: 1, perPage: 10) {
-                mediaList (userName: $name, type: $chosenType, sort: SCORE_DESC) {
-                    media {
-                        title {
-                            romaji
-                        }
-                    }
-                    score
-                }
-            }
-        }
-        '''
-
-    # TODO: allow user to enter their username
-    userName = 'SuccubusSenpai' #input("Enter your Anilist username: ")
-
-    # Block of code with error handling to have the user decide if they want to view their top rated anime or manga
+# Function to have the user decide if they want to view their top rated anime or manga w/ error handling.
+def chooseType():
+    # two defaults before entering while
     isValidType = False
     userType = 'ANIME'
     while not isValidType:
@@ -38,14 +18,19 @@ def getTopMedia():
         else:
             print("Error! Invalid type. Please try again.")
 
+    return userType
+
+def getTopMedia():
+
     # variables fed in by the user to grab their info
     variables = {
-        'name': userName.strip(),
-        'chosenType': userType
+        'name': input("Enter your Anilist username: ").strip(),
+        'chosenType': chooseType()
     }
     # anilist api url and grabbing the response.
     url = 'https://graphql.anilist.co'
-    response = requests.post(url, json={'query': query, 'variables': variables})
+    # query used from the grabTopMedia file.
+    response = requests.post(url, json={'query': grabTopMediaQuery, 'variables': variables})
 
     return response
 
@@ -64,13 +49,3 @@ def printTopMedia(response):
                 print("\"" + entry['media']['title']['romaji'] + "\" with a score of: " + str(entry['score']))
     elif response.status_code == 404:
         print("Could not find your Anilist Profile.")
-
-
-def main():
-    #TODO: Let a user filter by anime / manga, grab a list of the top 10.
-    response = getTopMedia()
-    printTopMedia(response)
-
-
-if __name__ == '__main__':
-    main()
